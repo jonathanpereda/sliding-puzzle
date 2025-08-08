@@ -83,9 +83,49 @@ class Board:
             if self.is_solvable() and shuffled != solved:
                 break
         if attempts == max_attempts:
-            print("ERROR: Failed to find a solvable board")
-            print("Reverting to solved board...")
-            self.tiles = self._generate_tiles()
+            raise ValueError("ERROR: Failed to find a solvable board")
+            #print("ERROR: Failed to find a solvable board")
+            #print("Reverting to solved board...")
+            #self.tiles = self._generate_tiles()
 
+    def find_blank(self):
+        #Search current grid for None value, return 0-indexed (r,c)
+        for i, row in enumerate(self.tiles):
+            for j, val in enumerate(row):
+                if val is None:
+                    return (i,j)
+        raise ValueError("ERROR: Failed to find blank space")
+    
+    def legal_moves(self):
+        blank_r, blank_c = self.find_blank()
+        legal_list = []
+        if blank_r < self.size - 1:
+            legal_list.append("U")
+        if blank_r > 0:
+            legal_list.append("D")
+        if blank_c < self.size - 1:
+            legal_list.append("L")
+        if blank_c > 0:
+            legal_list.append("R")
+        if not legal_list:
+            raise ValueError("ERROR: No legal moves")
+        return legal_list
+    
+    def do_move(self, dir):
+        if dir in self.legal_moves():
+            #Swap place of blank and pushed tile based on delta transformations
+            #Return true for success and false for illegal moves
+            blank_r, blank_c = self.find_blank()
+            deltas = {"U": (1,0), "D": (-1,0), "L": (0,1), "R": (0,-1)}
+            dr, dc = deltas[dir]
+            pr, pc = blank_r + dr, blank_c + dc
+
+            self.tiles[blank_r][blank_c], self.tiles[pr][pc] = self.tiles[pr][pc], self.tiles[blank_r][blank_c]
+            return True
+        else:
+            return False
+
+    def is_solved(self):
+        return self.flat_to_grid(self.solved_flat()) == self.tiles
         
                 
