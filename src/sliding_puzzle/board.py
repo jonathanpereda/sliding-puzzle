@@ -1,3 +1,5 @@
+import random
+
 class Board:
 
     def __init__(self, size):
@@ -6,14 +8,10 @@ class Board:
 
     def _generate_tiles(self):
         #Create the flat list of numbers based on board size including an empty space: None
-        flat_list = list(range(1, self.size**2)) + [None]
+        flat_list = self.solved_flat()
 
         #Compile our flat list into a grid 
-        rows = []
-        for start in range(0, len(flat_list), self.size):
-            rows.append(flat_list[start:start+self.size])
-
-        return rows
+        return self.flat_to_grid(flat_list)
     
     def display(self):
         #Look at each row
@@ -27,6 +25,10 @@ class Board:
                     clean_list.append(" ")
             print(" | ".join(clean_list))
 
+    def solved_flat(self):
+        #Create the flat list of numbers based on board size including an empty space: None
+        return list(range(1, self.size**2)) + [None]
+
     def flatten_grid(self):
         flat_list = []
         #Flatten grid into a single list ignoring None
@@ -35,6 +37,13 @@ class Board:
                 if val is not None:
                     flat_list.append(val)
         return flat_list
+    
+    def flat_to_grid(self, flat):
+        rows = []
+        for start in range(0, len(flat), self.size):
+            rows.append(flat[start:start+self.size])
+
+        return rows
     
     def count_inversions(self, flat):
         count = 0
@@ -57,5 +66,24 @@ class Board:
         else:
             return False
 
+    def shuffle(self):
+        #Start with solved flat
+        solved = self.solved_flat()
+        attempts = 0
+        max_attempts = 1000
+        while attempts < max_attempts:
+            attempts += 1
+            #Create clone of solved flat and shuffle it
+            shuffled = solved[:]
+            random.shuffle(shuffled)
+            #Update current board to shuffled and test solvability
+            self.tiles = self.flat_to_grid(shuffled)
+            if self.is_solvable() and shuffled != solved:
+                break
+        if attempts == max_attempts:
+            print("ERROR: Failed to find a solvable board")
+            print("Reverting to solved board...")
+            self.tiles = self._generate_tiles()
 
-
+        
+                
