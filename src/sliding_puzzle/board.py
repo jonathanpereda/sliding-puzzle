@@ -2,9 +2,11 @@ import random
 
 class Board:
 
-    def __init__(self, size):
+    def __init__(self, size, start_shuffled=False):
         self.size = size
         self.tiles = self._generate_tiles()
+        if start_shuffled:
+            self.shuffle()
 
     def _generate_tiles(self):
         #Create the flat list of numbers based on board size including an empty space: None

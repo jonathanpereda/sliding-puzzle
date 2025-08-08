@@ -1,10 +1,16 @@
 from .board import Board
 
 def start_game():
-    board = Board(3)
+    print("Generating solved board...")
+    board = Board(3, False)
     board.display()
-    print(board.is_solvable())
+    print("Solvability: " + str(board.is_solvable()))
     print("Shuffling...")
     board.shuffle()
     board.display()
-    print(board.is_solvable())
+    print("Solvability: " + str(board.is_solvable()))
+    print()
+    print("Generating shuffled board...")
+    board2 = Board(3, True)
+    board2.display()
+    print("Solvability: " + str(board.is_solvable()))
