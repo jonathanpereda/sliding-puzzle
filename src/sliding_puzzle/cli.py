@@ -1,10 +1,55 @@
-import os;
+import os, time
+from time import sleep
 from .board import Board
 from .solver_utils import goal_state
 from .solvers.bfs import bfs
 
 
+def playback_bfs_solution(size: int, delay: float=0.2):
+    game_board = Board(3, start_shuffled=True)
+    start = game_board.to_state()
+    goal = goal_state(size)
+    moves, stats = bfs(start, size, goal)
+
+    os.system("cls" if os.name=="nt" else "clear")
+    print()
+    print("Starting board:")
+    print()
+    game_board.display()
+    time.sleep(delay*10)
+
+
+    for m in moves:
+        os.system("cls" if os.name=="nt" else "clear")
+        print()
+        print("Running solution. Move: "+m)
+        print()
+        game_board.display()
+        time.sleep(delay)
+        game_board.do_move(m)
+
+    os.system("cls" if os.name=="nt" else "clear")
+    print()
+    print("Final board:")
+    print()
+    game_board.display()
+    print()
+    print("Simulation complete")
+    print("Solution length:", len(moves))
+    print("Stats:", stats)
+
+
+
+
+
 def start_game():
+
+
+    playback_bfs_solution(3)
+
+
+
+    '''BASIC BFS TEST
 
     b = Board(3, start_shuffled=True)
     start = b.to_state()
@@ -12,6 +57,8 @@ def start_game():
     moves, stats = bfs(start, 3, goal)
     print("Solution length:", len(moves))
     print("Stats:", stats)
+
+    '''
 
 
     '''BASIC BOARD TESTS

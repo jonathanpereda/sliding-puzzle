@@ -32,7 +32,6 @@ def bfs(start_state, size, goal):
                 "nodes_expanded": node_counter,
                 "depth": depth,
                 "time_ms": (end_time - start_time) * 1000.0,
-                "moves_list": moves,
             }
             return moves, stats
             
