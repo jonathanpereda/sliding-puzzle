@@ -1,8 +1,20 @@
 import os;
 from .board import Board
+from .solver_utils import goal_state
+from .solvers.bfs import bfs
 
 
 def start_game():
+
+    b = Board(3, start_shuffled=True)
+    start = b.to_state()
+    goal = goal_state(3)
+    moves, stats = bfs(start, 3, goal)
+    print("Solution length:", len(moves))
+    print("Stats:", stats)
+
+
+    '''BASIC BOARD TESTS
 
     print("--------------------------------")
     print()
@@ -77,7 +89,9 @@ def start_game():
     print("Tests completed!")
     print()
 
-    #''' GAME LOOP
+    '''
+
+    ''' GAME LOOP
 
     print("--------------------------------")
     print()
@@ -86,18 +100,21 @@ def start_game():
     print("--------------------------------")
     print()
     print("Wecome!")
+
+    max_grid_size = 11
     while True:
-        grid_size = input(">- Select grid size: [3x3 = 3] [4x4 = 4] -<   ").strip().lower()
-        match grid_size:
-            case "3":
-                game_board = Board(3, start_shuffled=True)
+        size_input = input(">- Select grid size # (e.g. [3x3 = 3], [4x4 = 4]...) -<   ").strip()
+        if size_input.isdigit():
+            grid_size = int(size_input)
+            if grid_size > max_grid_size:
+                print("Grid size must be less than "+str(max_grid_size + 1))
+            elif grid_size < 2:
+                print("Grid size must be at least 2")
+            else:
                 break
-            case "4":
-                game_board = Board(4, start_shuffled=True)
-                break
-            case _:
-                print("Not a valid input")
-    #game_board = Board(3, start_shuffled=True)
+        else:
+            print("Invalid input, try again")
+    game_board = Board(grid_size, start_shuffled=True)
     keymap = {"u":"U","d":"D","l":"L","r":"R"}
     status = "Make a move!"
     while True:
@@ -122,12 +139,9 @@ def start_game():
                 valid_move = game_board.do_move(keymap.get(move))
                 status = "Make a move!"
                 if not valid_move:
-                    #print("Illegal move. Current legal moves: ", game_board.legal_moves())
                     status = "Illegal move. Current legal moves: " + str(game_board.legal_moves())
             case _:
                 status = "Invalid move, try again: "
-                #print("Invalid move, try again: ")
-                #print()
                 
     #'''
 

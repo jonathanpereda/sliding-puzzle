@@ -69,6 +69,9 @@ class Board:
         else:
             return False
         
+    def is_solved(self):
+        return self.flat_to_grid(self.solved_flat()) == self.tiles
+        
     def get_blanks_row(self):
         #Grabs row number that has blank on it. 1-indexed from bottom
         for i, row in enumerate(self.tiles):
@@ -134,7 +137,13 @@ class Board:
         else:
             return False
 
-    def is_solved(self):
-        return self.flat_to_grid(self.solved_flat()) == self.tiles
-        
-                
+    def to_state(self):
+        flat_list = []
+        #Flatten grid into a single tuple replacing None with 0
+        for row in self.tiles:
+            for val in row:
+                if val is not None:
+                    flat_list.append(val)
+                else:
+                    flat_list.append(0)
+        return tuple(flat_list)
