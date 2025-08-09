@@ -11,6 +11,10 @@ def start_game():
     print("--------------------------------")
     print()
 
+    print()
+    print("Testing 3x3")
+    print()
+
     print("Generating solved board...")
     board = Board(3, False)
     board.display()
@@ -39,15 +43,61 @@ def start_game():
     print("Is solved: " + str(board2.is_solved()))
 
     print()
+    print("Testing 4x4")
+    print()
+
+    print("Generating solved board...")
+    board3 = Board(4, False)
+    board3.display()
+    print("Solvability: " + str(board3.is_solvable()))
+    print("Blank is at: " + str(board3.find_blank()))
+    print("Legal moves: " + str(board3.legal_moves()))
+    print("Is solved: " + str(board3.is_solved()))
+    print("Shuffling...")
+    board3.shuffle()
+    board3.display()
+    print("Solvability: " + str(board3.is_solvable()))
+    print("Blank is at: " + str(board3.find_blank()))
+    print("Legal moves: " + str(board3.legal_moves()))
+    print("Is solved: " + str(board3.is_solved()))
+    print()
+    print("Generating shuffled board...")
+    board4 = Board(4, True)
+    board4.display()
+    print("Solvability: " + str(board4.is_solvable()))
+    print("Blank is at: " + str(board4.find_blank()))
+    print("Legal moves: " + str(board4.legal_moves()))
+    print("Is solved: " + str(board4.is_solved()))
+    print("Tring move U...")
+    board4.do_move("U")
+    board4.display()
+    print("Is solved: " + str(board4.is_solved()))
+
+    print()
     print("Tests completed!")
     print()
+
+    #''' GAME LOOP
+
     print("--------------------------------")
     print()
     print("Starting game loop...")
     print()
     print("--------------------------------")
     print()
-    game_board = Board(3, start_shuffled=True)
+    print("Wecome!")
+    while True:
+        grid_size = input(">- Select grid size: [3x3 = 3] [4x4 = 4] -<   ").strip().lower()
+        match grid_size:
+            case "3":
+                game_board = Board(3, start_shuffled=True)
+                break
+            case "4":
+                game_board = Board(4, start_shuffled=True)
+                break
+            case _:
+                print("Not a valid input")
+    #game_board = Board(3, start_shuffled=True)
     keymap = {"u":"U","d":"D","l":"L","r":"R"}
     status = "Make a move!"
     while True:
@@ -60,7 +110,7 @@ def start_game():
             print("You won!")
             print("Ending game...")
             break
-        move = input("- [Move (u/d/l/r)] [x = reshuffle] [q = quit] -").strip().lower()
+        move = input(">- [Move (u/d/l/r)] [x = reshuffle] [q = quit] -<   ").strip().lower()
         match move:
             case "q":
                 print("Ending game...")
@@ -79,7 +129,7 @@ def start_game():
                 #print("Invalid move, try again: ")
                 #print()
                 
-
+    #'''
 
 
 
