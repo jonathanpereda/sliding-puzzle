@@ -1,66 +1,75 @@
-import os;
+import os, time
+from time import sleep
 from .board import Board
+from .solver_utils import goal_state
+from .solvers.bfs import bfs
 
 
-def start_game():
+def playback_bfs_solution(size: int, delay: float=0.2):
+    game_board = Board(size, start_shuffled=True)
+    start = game_board.to_state()
+    goal = goal_state(size)
+    moves, stats = bfs(start, size, goal)
 
-    print("--------------------------------")
-    print()
-    print("Welcome: starting board tests...")
-    print()
-    print("--------------------------------")
+    os.system("cls" if os.name=="nt" else "clear")
+    print("\nStarting board:\n")
+    game_board.display()
+    #time.sleep(delay*10)
+    while True:
+        choice = input("\nPress [Enter] to begin demo: ")
+        if choice == "":
+            break
+        else:
+            print("Invalid input")
+
+    for m in moves:
+        os.system("cls" if os.name=="nt" else "clear")
+        print("\nRunning solution. Move: "+m)
+        print()
+        game_board.display()
+        time.sleep(delay)
+        game_board.do_move(m)
+
+    os.system("cls" if os.name=="nt" else "clear")
+    print("\nFinal board:\n")
+    game_board.display()
+    print("\nSimulation complete\n")
+    print("Solution length:", len(moves))
+    print("Stats:", stats)
     print()
 
-    print("Generating solved board...")
-    board = Board(3, False)
-    board.display()
-    print("Solvability: " + str(board.is_solvable()))
-    print("Blank is at: " + str(board.find_blank()))
-    print("Legal moves: " + str(board.legal_moves()))
-    print("Is solved: " + str(board.is_solved()))
-    print("Shuffling...")
-    board.shuffle()
-    board.display()
-    print("Solvability: " + str(board.is_solvable()))
-    print("Blank is at: " + str(board.find_blank()))
-    print("Legal moves: " + str(board.legal_moves()))
-    print("Is solved: " + str(board.is_solved()))
-    print()
-    print("Generating shuffled board...")
-    board2 = Board(3, True)
-    board2.display()
-    print("Solvability: " + str(board2.is_solvable()))
-    print("Blank is at: " + str(board2.find_blank()))
-    print("Legal moves: " + str(board2.legal_moves()))
-    print("Is solved: " + str(board2.is_solved()))
-    print("Tring move U...")
-    board2.do_move("U")
-    board2.display()
-    print("Is solved: " + str(board2.is_solved()))
 
-    print()
-    print("Tests completed!")
-    print()
-    print("--------------------------------")
-    print()
-    print("Starting game loop...")
-    print()
-    print("--------------------------------")
-    print()
-    game_board = Board(3, start_shuffled=True)
+def manual_play():
+ 
+    os.system("cls" if os.name=="nt" else "clear")
+    print("Welcome!\n")
+
+    max_grid_size = 11
+    while True:
+        size_input = input(">- Select grid size # (e.g. [3x3 = 3], [4x4 = 4]...) -<   ").strip()
+        if size_input.isdigit():
+            grid_size = int(size_input)
+            if grid_size > max_grid_size:
+                print("Grid size must be less than "+str(max_grid_size + 1))
+            elif grid_size < 2:
+                print("Grid size must be at least 2")
+            else:
+                break
+        else:
+            print("Invalid input, try again")
+    game_board = Board(grid_size, start_shuffled=True)
     keymap = {"u":"U","d":"D","l":"L","r":"R"}
     status = "Make a move!"
     while True:
         os.system("cls" if os.name=="nt" else "clear")
-        print()
         print(status)
         print()
         game_board.display()
         if game_board.is_solved() is True:
-            print("You won!")
-            print("Ending game...")
+            print("\nYou won!")
+            print("Ending game...\n")
             break
-        move = input("- [Move (u/d/l/r)] [x = reshuffle] [q = quit] -").strip().lower()
+        move = input("\n- [Move (u/d/l/r)] [x = reshuffle] [q = quit] -   >").strip().lower()
         match move:
             case "q":
                 print("Ending game...")
@@ -72,12 +81,34 @@ def start_game():
                 valid_move = game_board.do_move(keymap.get(move))
                 status = "Make a move!"
                 if not valid_move:
-                    #print("Illegal move. Current legal moves: ", game_board.legal_moves())
                     status = "Illegal move. Current legal moves: " + str(game_board.legal_moves())
             case _:
                 status = "Invalid move, try again: "
-                #print("Invalid move, try again: ")
-                #print()
+
+
+
+def start_game(mode: str = "", size: int = 3):
+
+    match mode:
+        case "manual":
+            manual_play()
+        case "bfs":
+            playback_bfs_solution(3)
+        case _:
+            os.system("cls" if os.name=="nt" else "clear")
+            while True:
+                print("Choose mode: \n1) Manual play\n2) BFS demo (3x3)\n9) Quit")
+                choice = input(">")
+                match choice:
+                    case "1":
+                        manual_play()
+                    case "2":
+                        playback_bfs_solution(3)
+                    case "9":
+                        break
+                    case _:
+                        os.system("cls" if os.name=="nt" else "clear")
+                        print("Invalid selection. Try again:")
                 
 
 

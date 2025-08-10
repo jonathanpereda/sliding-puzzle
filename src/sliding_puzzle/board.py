@@ -16,15 +16,15 @@ class Board:
         return self.flat_to_grid(flat_list)
     
     def display(self):
+        cell_width = len(str(self.size*self.size - 1))
         #Look at each row
         for row in self.tiles:
             clean_list = []
             #Clean each row into string values
             for val in row:
-                if val is not None:
-                    clean_list.append(str(val))
-                else:
-                    clean_list.append(" ")
+                s = "" if val is None else str(val)
+                s = f"{s:>{cell_width}}"
+                clean_list.append(s)
             print(" | ".join(clean_list))
 
     def solved_flat(self):
@@ -60,13 +60,25 @@ class Board:
         #Pull the current grids inversion count
         flat = self.flatten_grid()
         inversions = self.count_inversions(flat)
+        blank_row = self.get_blanks_row()
         #Check solvability based on grid size
-        if self.size == 3:
+        if self.size % 2 == 1:
             return inversions % 2 == 0
-        elif self.size == 4:
-            return False
+        elif self.size % 2 == 0:
+            return (blank_row % 2 == 0 and inversions % 2 == 1) or (blank_row % 2 == 1 and inversions % 2 == 0)
         else:
             return False
+        
+    def is_solved(self):
+        return self.flat_to_grid(self.solved_flat()) == self.tiles
+        
+    def get_blanks_row(self):
+        #Grabs row number that has blank on it. 1-indexed from bottom
+        for i, row in enumerate(self.tiles):
+            for val in row:
+                if val is None:
+                    return self.size - i
+        raise ValueError("ERROR: Could not find row containing [blank]")
 
     def shuffle(self):
         #Start with solved flat
@@ -125,7 +137,13 @@ class Board:
         else:
             return False
 
-    def is_solved(self):
-        return self.flat_to_grid(self.solved_flat()) == self.tiles
-        
-                
+    def to_state(self):
+        flat_list = []
+        #Flatten grid into a single tuple replacing None with 0
+        for row in self.tiles:
+            for val in row:
+                if val is not None:
+                    flat_list.append(val)
+                else:
+                    flat_list.append(0)
+        return tuple(flat_list)
