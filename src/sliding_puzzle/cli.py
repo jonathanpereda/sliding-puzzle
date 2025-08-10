@@ -6,7 +6,7 @@ from .solvers.bfs import bfs
 
 
 def playback_bfs_solution(size: int, delay: float=0.2):
-    game_board = Board(3, start_shuffled=True)
+    game_board = Board(size, start_shuffled=True)
     start = game_board.to_state()
     goal = goal_state(size)
     moves, stats = bfs(start, size, goal)
