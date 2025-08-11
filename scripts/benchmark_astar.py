@@ -7,13 +7,14 @@ import random
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from src.sliding_puzzle.solver_utils import get_neighbors, goal_state
-from src.sliding_puzzle.solvers.bfs import bfs 
+from src.sliding_puzzle.solvers.astar import astar 
 
 
 
 DEFAULT_BUCKETS = [0,5,10,15,20,25,30,35,40,45,50,55,60]
 DEFAULT_TRIALS = 30
 DEFAULT_BASE_SEED = 1337
+SOLVER_NAME = "astar_manhattan"
 
 #Clear file before writing
 RESET_CSV = True
@@ -58,8 +59,8 @@ def run_one_trial(size, depth, trial, base_seed):
 
     start = do_scramble(goal, depth, size, rng)
 
-    moves, stats = bfs(start, size, goal)
-    #if bfs fails return none
+    moves, stats = astar(start, size, goal)
+    #if solver fails return none
     if not isinstance(moves, list):
         return None
 
@@ -67,6 +68,8 @@ def run_one_trial(size, depth, trial, base_seed):
     time_sec = stats["time_ms"] / 1000.0
     states_expanded = stats["nodes_expanded"]
     solution_length = stats["depth"]
+
+
 
     row = {
         "timestamp": datetime.now().isoformat(timespec="seconds"),
@@ -76,7 +79,7 @@ def run_one_trial(size, depth, trial, base_seed):
         "time_sec": time_sec,
         "states_expanded": states_expanded,
         "solution_length": solution_length,
-        "solver": "BFS",
+        "solver": SOLVER_NAME,
         "seed": trial_seed,
     }
     return row
@@ -100,7 +103,7 @@ def do_scramble(goal_tuple, depth, size, rng):
 
 
 if __name__ == "__main__":
-    csv_path = DATA_DIR / "bfs_runs.csv"
+    csv_path = DATA_DIR / "astar_runs[3x3].csv"
 
     #Clear file before writing
     if RESET_CSV and csv_path.exists():

@@ -1,15 +1,22 @@
 import os, time
 from time import sleep
 from .board import Board
-from .solver_utils import goal_state
+from .solver_utils import goal_state, gen_goal_map
 from .solvers.bfs import bfs
+from .solvers.astar import astar
 
 
-def playback_bfs_solution(size: int, delay: float=0.2):
+def playback_solution(size: int, solver_type="bfs", delay: float=0.15):
     game_board = Board(size, start_shuffled=True)
     start = game_board.to_state()
-    goal = goal_state(size)
-    moves, stats = bfs(start, size, goal)
+    os.system("cls" if os.name=="nt" else "clear")
+    print("Generating solution...")
+
+    match solver_type:
+        case "bfs":
+            moves, stats = bfs(start, size)
+        case "astar":
+            moves, stats = astar(start, size)
 
     os.system("cls" if os.name=="nt" else "clear")
     print("\nStarting board:\n")
@@ -86,6 +93,20 @@ def manual_play():
                 status = "Invalid move, try again: "
 
 
+def test_mode():
+
+    b = Board(3, start_shuffled=True)
+    print("BFS")
+    print(bfs(b.to_state(),3))
+    print("\nA* [3x3]")
+    print(astar(b.to_state(),3))
+    b2 = Board(4, start_shuffled=True)
+    print("\nA* [4x4]")
+    print(astar(b2.to_state(),4))
+
+    
+
+
 
 def start_game(mode: str = "", size: int = 3):
 
@@ -93,19 +114,25 @@ def start_game(mode: str = "", size: int = 3):
         case "manual":
             manual_play()
         case "bfs":
-            playback_bfs_solution(3)
+            playback_solution(3)
         case _:
             os.system("cls" if os.name=="nt" else "clear")
             while True:
-                print("Choose mode: \n1) Manual play\n2) BFS demo (3x3)\n9) Quit")
+                print("Choose mode: \n1) Manual play\n2) BFS demo (3x3)\n3) A* demo (3x3)\n4) A* demo (4x4)\n9) Quit")
                 choice = input(">")
                 match choice:
                     case "1":
                         manual_play()
                     case "2":
-                        playback_bfs_solution(3)
-                    case "9":
+                        playback_solution(3,"bfs")
+                    case "3":
+                        playback_solution(3,"astar")
+                    case "4":
+                        playback_solution(4,"astar")
+                    case "9" | "q":
                         break
+                    case "t":
+                        test_mode()
                     case _:
                         os.system("cls" if os.name=="nt" else "clear")
                         print("Invalid selection. Try again:")

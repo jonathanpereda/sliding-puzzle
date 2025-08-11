@@ -1,8 +1,11 @@
 from collections import deque
 import time
-from ..solver_utils import get_neighbors
+from ..solver_utils import get_neighbors, goal_state
 
-def bfs(start_state, size, goal):
+def bfs(start_state, size, goal=None):
+
+    if goal is None:
+        goal = goal_state(size)
 
     queue = deque([start_state])    #List of states that we need to visit
     visited = set([start_state])    #List of states that we have already visited

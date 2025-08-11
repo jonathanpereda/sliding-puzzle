@@ -38,3 +38,25 @@ def get_neighbors(state, size):
         neighbors.append((ns, move))
 
     return neighbors
+
+
+def gen_goal_map(size):
+    #Make a map of the (r,c) position of every tile in a solved board of 'size' 
+    flat = list(range(1, size**2))
+    map = {1: (0,0)}
+    for tile in flat:
+        if tile:
+            map[tile] = ((tile-1)//size, (tile-1)%size)
+    return map
+
+
+def manhattan_dist(goal_map, current, size):
+    #Get the difference between (r,c) position of every tile from current board against goal board
+    distance = 0
+    for i, tile in enumerate(current):
+        if tile:
+            r, c = i//size, i%size
+            gr, gc = goal_map[tile]
+            r_dist, c_dist = abs(gr - r), abs(gc - c)
+            distance += (r_dist+c_dist)
+    return distance
