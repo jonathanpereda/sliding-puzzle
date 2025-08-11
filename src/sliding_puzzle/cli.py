@@ -1,8 +1,9 @@
 import os, time
 from time import sleep
 from .board import Board
-from .solver_utils import goal_state
+from .solver_utils import goal_state, gen_goal_map
 from .solvers.bfs import bfs
+from .solvers.astar import astar
 
 
 def playback_bfs_solution(size: int, delay: float=0.2):
@@ -86,6 +87,20 @@ def manual_play():
                 status = "Invalid move, try again: "
 
 
+def test_mode():
+
+    b = Board(3, start_shuffled=True)
+    print("BFS")
+    print(bfs(b.to_state(),3))
+    print("\nA*")
+    print(astar(b.to_state(),3))
+    b2 = Board(4, start_shuffled=True)
+    print("\nA* [4x4]")
+    print(astar(b2.to_state(),4))
+
+    
+
+
 
 def start_game(mode: str = "", size: int = 3):
 
@@ -104,8 +119,10 @@ def start_game(mode: str = "", size: int = 3):
                         manual_play()
                     case "2":
                         playback_bfs_solution(3)
-                    case "9":
+                    case "9" | "q":
                         break
+                    case "t":
+                        test_mode()
                     case _:
                         os.system("cls" if os.name=="nt" else "clear")
                         print("Invalid selection. Try again:")
