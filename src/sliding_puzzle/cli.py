@@ -9,6 +9,8 @@ from .solvers.astar import astar
 def playback_solution(size: int, solver_type="bfs", delay: float=0.15):
     game_board = Board(size, start_shuffled=True)
     start = game_board.to_state()
+    os.system("cls" if os.name=="nt" else "clear")
+    print("Generating solution...")
 
     match solver_type:
         case "bfs":
@@ -96,7 +98,7 @@ def test_mode():
     b = Board(3, start_shuffled=True)
     print("BFS")
     print(bfs(b.to_state(),3))
-    print("\nA*")
+    print("\nA* [3x3]")
     print(astar(b.to_state(),3))
     b2 = Board(4, start_shuffled=True)
     print("\nA* [4x4]")

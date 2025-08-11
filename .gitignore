@@ -208,4 +208,3 @@ __marimo__/
 
 # Benchmarking outputs
 data/*.csv
-docs/*_summary_*.md

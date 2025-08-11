@@ -95,7 +95,7 @@ def render_markdown(agg, board_size, title_solver):
     lines = [title, datelog, "", header, sep] + data_rows
     markdown = "\n".join(lines) + "\n"
 
-    out_path = Path("docs") / f"bfs_summary_{today}.md"
+    out_path = Path("docs") / f"bfs[3x3]_summary_{today}.md"     #CHANGE FILE NAME
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(markdown, encoding="utf-8")
 
