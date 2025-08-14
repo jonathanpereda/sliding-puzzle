@@ -4,6 +4,7 @@ from .board import Board
 from .solver_utils import goal_state, gen_goal_map
 from .solvers.bfs import bfs
 from .solvers.astar import astar
+from .solvers.idastar import idastar
 
 
 def playback_solution(size: int, solver_type="bfs", delay: float=0.15):
@@ -17,6 +18,8 @@ def playback_solution(size: int, solver_type="bfs", delay: float=0.15):
             moves, stats = bfs(start, size)
         case "astar":
             moves, stats = astar(start, size)
+        case "idastar":
+            moves, stats = idastar(start, size)
 
     os.system("cls" if os.name=="nt" else "clear")
     print("\nStarting board:\n")
@@ -95,14 +98,20 @@ def manual_play():
 
 def test_mode():
 
-    b = Board(3, start_shuffled=True)
+    '''b = Board(3, start_shuffled=True)
     print("BFS")
     print(bfs(b.to_state(),3))
     print("\nA* [3x3]")
     print(astar(b.to_state(),3))
     b2 = Board(4, start_shuffled=True)
     print("\nA* [4x4]")
-    print(astar(b2.to_state(),4))
+    print(astar(b2.to_state(),4))'''
+
+
+    b = Board(4, start_shuffled=True)
+    print("Board made running IDA*...\n")
+    print(idastar(b.to_state(),4))
+
 
     
 
@@ -118,7 +127,7 @@ def start_game(mode: str = "", size: int = 3):
         case _:
             os.system("cls" if os.name=="nt" else "clear")
             while True:
-                print("Choose mode: \n1) Manual play\n2) BFS demo (3x3)\n3) A* demo (3x3)\n4) A* demo (4x4)\n9) Quit")
+                print("Choose mode: \n1) Manual play\n2) BFS demo (3x3)\n3) A* demo (3x3)\n4) A* demo (4x4)\n5) IDA* demo (3x3)\n9) Quit")
                 choice = input(">")
                 match choice:
                     case "1":
@@ -129,6 +138,8 @@ def start_game(mode: str = "", size: int = 3):
                         playback_solution(3,"astar")
                     case "4":
                         playback_solution(4,"astar")
+                    case "5":
+                        playback_solution(3,"idastar")
                     case "9" | "q":
                         break
                     case "t":
