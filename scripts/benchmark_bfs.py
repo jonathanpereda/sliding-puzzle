@@ -1,8 +1,7 @@
-import sys
+import sys, random, tracemalloc
 from pathlib import Path
 import csv
 from datetime import datetime
-import random
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -14,6 +13,7 @@ from src.sliding_puzzle.solvers.bfs import bfs
 DEFAULT_BUCKETS = [0,5,10,15,20,25,30,35,40,45,50,55,60]
 DEFAULT_TRIALS = 30
 DEFAULT_BASE_SEED = 1337
+SOLVER_NAME = "BFS"
 
 #Clear file before writing
 RESET_CSV = True
@@ -28,6 +28,7 @@ CSV_FIELDS = [
     "trial",
     "time_sec",
     "states_expanded",
+    "peak_memory_use",
     "solution_length",
     "solver",
     "seed"
@@ -55,6 +56,7 @@ def run_one_trial(size, depth, trial, base_seed):
     goal = goal_state(size)
     trial_seed = base_seed + depth * 1000 + trial
     rng = random.Random(trial_seed)
+    tracemalloc.start()
 
     start = do_scramble(goal, depth, size, rng)
 
@@ -62,6 +64,10 @@ def run_one_trial(size, depth, trial, base_seed):
     #if bfs fails return none
     if not isinstance(moves, list):
         return None
+
+    current, peak = tracemalloc.get_traced_memory()
+    peak_kb = peak / 1024
+    tracemalloc.stop()
 
     #map stats to csv
     time_sec = stats["time_ms"] / 1000.0
@@ -75,8 +81,9 @@ def run_one_trial(size, depth, trial, base_seed):
         "trial": trial,
         "time_sec": time_sec,
         "states_expanded": states_expanded,
+        "peak_memory_use": peak_kb,
         "solution_length": solution_length,
-        "solver": "BFS",
+        "solver": SOLVER_NAME,
         "seed": trial_seed,
     }
     return row
@@ -100,7 +107,7 @@ def do_scramble(goal_tuple, depth, size, rng):
 
 
 if __name__ == "__main__":
-    csv_path = DATA_DIR / "bfs_runs.csv"
+    csv_path = DATA_DIR / "bfs_runs[3x3].csv"
 
     #Clear file before writing
     if RESET_CSV and csv_path.exists():

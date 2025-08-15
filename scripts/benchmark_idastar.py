@@ -6,16 +6,16 @@ from datetime import datetime
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from src.sliding_puzzle.solver_utils import get_neighbors, goal_state
-from src.sliding_puzzle.solvers.astar import astar 
+from src.sliding_puzzle.solvers.idastar import idastar
 
 
 
 DEFAULT_BUCKETS = [0,5,10,15,20,25,30,35,40,45,50,55,60]
 DEFAULT_TRIALS = 30
 DEFAULT_BASE_SEED = 1337
-SOLVER_NAME = "astar_manhattan"
-CREATED_FILE_NAME = "astar_runs[4x4].csv"
-SIZE = 4
+SOLVER_NAME = "idastar_manhattan"
+CREATED_FILE_NAME = "idastar_runs[3x3].csv"
+SIZE = 3
 
 #Clear file before writing
 RESET_CSV = True
@@ -62,7 +62,7 @@ def run_one_trial(size, depth, trial, base_seed):
 
     start = do_scramble(goal, depth, size, rng)
 
-    moves, stats = astar(start, size, goal)
+    moves, stats = idastar(start, size, goal)
     #if solver fails return none
     if not isinstance(moves, list):
         return None

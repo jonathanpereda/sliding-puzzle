@@ -2,6 +2,11 @@ import csv
 from pathlib import Path
 from datetime import date
 
+today = date.today().isoformat()
+SIZE = 3
+CREATED_FILE_NAME = f"idastar[3x3]_summary_{today}.md"
+SOLVER_TITLE = "IDASTAR_manhattan"
+CVS_PATH = "data/idastar_runs[3x3].csv"
 
 def load_solver_rows(csv_path):
     with open(csv_path, newline="", encoding="utf-8") as f:
@@ -9,7 +14,7 @@ def load_solver_rows(csv_path):
         rows = []
         for row in reader:
 
-            required_rows = ["bucket_depth_n","trial","time_sec","states_expanded","solution_length","solver","board_size"]
+            required_rows = ["bucket_depth_n","trial","time_sec","states_expanded","peak_memory_use","solution_length","solver","board_size"]
             if any(not row[i] for i in required_rows):     #skip rows missing time_sec (assuming that means the whole row is empty)
                 continue
 
@@ -17,6 +22,7 @@ def load_solver_rows(csv_path):
             trial = int(row["trial"])
             time_sec = float(row["time_sec"])
             states = int(row["states_expanded"])
+            peak_kb = float(row["peak_memory_use"])
             solu = int(row["solution_length"])
             board_size = int(row["board_size"])
             solver = row["solver"]
@@ -28,6 +34,7 @@ def load_solver_rows(csv_path):
                 "trial": trial,
                 "time_sec": time_sec,
                 "states_expanded": states,
+                "peak_memory_use": peak_kb,
                 "solution_length": solu,
                 "board_size": board_size,
                 "solver": solver,
@@ -45,33 +52,35 @@ def aggregate_by_depth(rows):
                 "trials": 0,
                 "sum_time_sec": 0.0,
                 "sum_states": 0,
+                "sum_mem": 0.0,
                 "sum_solu": 0
             }
 
         agg[depth]["trials"] += 1
         agg[depth]["sum_time_sec"] += row["time_sec"]
         agg[depth]["sum_states"] += row["states_expanded"]
+        agg[depth]["sum_mem"] += row["peak_memory_use"]
         agg[depth]["sum_solu"] += row["solution_length"]
 
     for depth, a in agg.items():
         trials = a["trials"] or 1  #guard divide by zero
         a["avg_time_ms"] = (a["sum_time_sec"] / trials) * 1000.0
         a["avg_states"] = a["sum_states"] / trials
+        a["avg_mem"] = a["sum_mem"] / trials
         a["avg_solu"] = a["sum_solu"] / trials
 
-    for i in ["sum_time_sec", "sum_states", "sum_solu"]:
-        del a[i]    #delete intermediate sums
+        for i in ["sum_time_sec", "sum_states", "sum_mem", "sum_solu"]:
+            del a[i]    #delete intermediate sums
 
     return agg
 
 
 def render_markdown(agg, board_size, title_solver):
-    today = date.today().isoformat()
     title = f"# {title_solver} -Benchmark Summary- [{board_size}x{board_size}]"
     datelog = f"Generated: {today}"
 
-    header = "| Depth (N) | Trials | Avg Time (ms) | Avg States | Avg Soln Len |"
-    sep    = "|-----------|--------|---------------|------------|--------------|"
+    header = "| Depth (N) | Trials | Avg Time (ms) | Avg States | Avg Peak Mem (kb) | Avg Soln Len |"
+    sep    = "|-----------|--------|---------------|------------|-------------------|--------------|"
 
     depths = sorted(agg.keys())
 
@@ -82,11 +91,12 @@ def render_markdown(agg, board_size, title_solver):
         trials = a["trials"]
         avg_ms = a["avg_time_ms"]
         avg_states = a["avg_states"]
+        avg_mem = a["avg_mem"]
         avg_solu = a["avg_solu"]
         
         row = (
             f"| {d:<9} | {trials:<6} | {avg_ms:<13.3f} | "
-            f"{avg_states:<10.0f} | {avg_solu:<12.1f} |"
+            f"{avg_states:<10.0f} | {avg_mem:<17.2f} | {avg_solu:<12.1f} |"
         )
 
 
@@ -95,7 +105,7 @@ def render_markdown(agg, board_size, title_solver):
     lines = [title, datelog, "", header, sep] + data_rows
     markdown = "\n".join(lines) + "\n"
 
-    out_path = Path("docs") / f"bfs[3x3]_summary_{today}.md"     #CHANGE FILE NAME
+    out_path = Path("docs") / CREATED_FILE_NAME    
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(markdown, encoding="utf-8")
 
@@ -104,4 +114,4 @@ def render_markdown(agg, board_size, title_solver):
 #agg = aggregate_by_depth(load_solver_rows(Path("data/bfs_runs.csv")))
 #print(agg[10])
 
-render_markdown(aggregate_by_depth(load_solver_rows(Path("data/bfs_runs.csv"))), 3, "BFS")
+render_markdown(aggregate_by_depth(load_solver_rows(Path(CVS_PATH))), SIZE, SOLVER_TITLE)

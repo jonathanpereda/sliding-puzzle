@@ -4,19 +4,22 @@ from .board import Board
 from .solver_utils import goal_state, gen_goal_map
 from .solvers.bfs import bfs
 from .solvers.astar import astar
+from .solvers.idastar import idastar
 
 
-def playback_solution(size: int, solver_type="bfs", delay: float=0.15):
+def playback_solution(size: int, solver_type="BFS", delay: float=0.15):
     game_board = Board(size, start_shuffled=True)
     start = game_board.to_state()
     os.system("cls" if os.name=="nt" else "clear")
     print("Generating solution...")
 
     match solver_type:
-        case "bfs":
+        case "BFS":
             moves, stats = bfs(start, size)
-        case "astar":
+        case "A*":
             moves, stats = astar(start, size)
+        case "IDA*":
+            moves, stats = idastar(start, size)
 
     os.system("cls" if os.name=="nt" else "clear")
     print("\nStarting board:\n")
@@ -31,7 +34,7 @@ def playback_solution(size: int, solver_type="bfs", delay: float=0.15):
 
     for m in moves:
         os.system("cls" if os.name=="nt" else "clear")
-        print("\nRunning solution. Move: "+m)
+        print("\nRunning "+solver_type+" solution. Move: "+m)
         print()
         game_board.display()
         time.sleep(delay)
@@ -95,14 +98,20 @@ def manual_play():
 
 def test_mode():
 
-    b = Board(3, start_shuffled=True)
+    '''b = Board(3, start_shuffled=True)
     print("BFS")
     print(bfs(b.to_state(),3))
     print("\nA* [3x3]")
     print(astar(b.to_state(),3))
     b2 = Board(4, start_shuffled=True)
     print("\nA* [4x4]")
-    print(astar(b2.to_state(),4))
+    print(astar(b2.to_state(),4))'''
+
+
+    b = Board(3, start_shuffled=True)
+    print("Board made running IDA*...\n")
+    print(idastar(b.to_state(),3))
+
 
     
 
@@ -118,21 +127,23 @@ def start_game(mode: str = "", size: int = 3):
         case _:
             os.system("cls" if os.name=="nt" else "clear")
             while True:
-                print("Choose mode: \n1) Manual play\n2) BFS demo (3x3)\n3) A* demo (3x3)\n4) A* demo (4x4)\n9) Quit")
+                print("Choose mode: \n1) Manual play\n2) BFS demo (3x3)\n3) A* demo (3x3)\n4) A* demo (4x4)\n5) IDA* demo (3x3)\n9) Quit")
                 choice = input(">")
                 match choice:
                     case "1":
                         manual_play()
                     case "2":
-                        playback_solution(3,"bfs")
+                        playback_solution(3,"BFS")
                     case "3":
-                        playback_solution(3,"astar")
+                        playback_solution(3,"A*")
                     case "4":
-                        playback_solution(4,"astar")
+                        playback_solution(4,"A*")
+                    case "5":
+                        playback_solution(3,"IDA*")
                     case "9" | "q":
                         break
-                    case "t":
-                        test_mode()
+                    #case "t":
+                    #    test_mode()
                     case _:
                         os.system("cls" if os.name=="nt" else "clear")
                         print("Invalid selection. Try again:")
