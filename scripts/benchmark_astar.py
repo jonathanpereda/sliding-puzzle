@@ -1,8 +1,7 @@
-import sys
+import sys, random, tracemalloc
 from pathlib import Path
 import csv
 from datetime import datetime
-import random
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -29,6 +28,7 @@ CSV_FIELDS = [
     "trial",
     "time_sec",
     "states_expanded",
+    "peak_memory_use",
     "solution_length",
     "solver",
     "seed"
@@ -56,6 +56,7 @@ def run_one_trial(size, depth, trial, base_seed):
     goal = goal_state(size)
     trial_seed = base_seed + depth * 1000 + trial
     rng = random.Random(trial_seed)
+    tracemalloc.start()
 
     start = do_scramble(goal, depth, size, rng)
 
@@ -63,6 +64,10 @@ def run_one_trial(size, depth, trial, base_seed):
     #if solver fails return none
     if not isinstance(moves, list):
         return None
+    
+    current, peak = tracemalloc.get_traced_memory()
+    peak_kb = peak / 1024
+    tracemalloc.stop()
 
     #map stats to csv
     time_sec = stats["time_ms"] / 1000.0
@@ -78,6 +83,7 @@ def run_one_trial(size, depth, trial, base_seed):
         "trial": trial,
         "time_sec": time_sec,
         "states_expanded": states_expanded,
+        "peak_memory_use": peak_kb,
         "solution_length": solution_length,
         "solver": SOLVER_NAME,
         "seed": trial_seed,
@@ -103,7 +109,7 @@ def do_scramble(goal_tuple, depth, size, rng):
 
 
 if __name__ == "__main__":
-    csv_path = DATA_DIR / "astar_runs[3x3].csv"
+    csv_path = DATA_DIR / "astar_runs[4x4].csv"
 
     #Clear file before writing
     if RESET_CSV and csv_path.exists():
@@ -111,7 +117,7 @@ if __name__ == "__main__":
 
     ensure_csv_with_header(csv_path, CSV_FIELDS)
 
-    size = 3
+    size = 4
     for depth in DEFAULT_BUCKETS:
         for trial in range(1, DEFAULT_TRIALS + 1):
             row = run_one_trial(size=size, depth=depth, trial=trial, base_seed=DEFAULT_BASE_SEED)

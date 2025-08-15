@@ -1,8 +1,7 @@
-import sys
+import sys, random, tracemalloc
 from pathlib import Path
 import csv
 from datetime import datetime
-import random
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -28,6 +27,7 @@ CSV_FIELDS = [
     "trial",
     "time_sec",
     "states_expanded",
+    "peak_memory_use",
     "solution_length",
     "solver",
     "seed"
@@ -55,6 +55,7 @@ def run_one_trial(size, depth, trial, base_seed):
     goal = goal_state(size)
     trial_seed = base_seed + depth * 1000 + trial
     rng = random.Random(trial_seed)
+    tracemalloc.start()
 
     start = do_scramble(goal, depth, size, rng)
 
@@ -62,6 +63,10 @@ def run_one_trial(size, depth, trial, base_seed):
     #if bfs fails return none
     if not isinstance(moves, list):
         return None
+
+    current, peak = tracemalloc.get_traced_memory()
+    peak_kb = peak / 1024
+    tracemalloc.stop()
 
     #map stats to csv
     time_sec = stats["time_ms"] / 1000.0
@@ -75,6 +80,7 @@ def run_one_trial(size, depth, trial, base_seed):
         "trial": trial,
         "time_sec": time_sec,
         "states_expanded": states_expanded,
+        "peak_memory_use": peak_kb,
         "solution_length": solution_length,
         "solver": "BFS",
         "seed": trial_seed,
