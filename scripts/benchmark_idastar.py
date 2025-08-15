@@ -14,6 +14,8 @@ DEFAULT_BUCKETS = [0,5,10,15,20,25,30,35,40,45,50,55,60]
 DEFAULT_TRIALS = 30
 DEFAULT_BASE_SEED = 1337
 SOLVER_NAME = "idastar_manhattan"
+CREATED_FILE_NAME = "idastar_runs[3x3].csv"
+SIZE = 3
 
 #Clear file before writing
 RESET_CSV = True
@@ -109,7 +111,7 @@ def do_scramble(goal_tuple, depth, size, rng):
 
 
 if __name__ == "__main__":
-    csv_path = DATA_DIR / "idastar_runs[3x3].csv"
+    csv_path = DATA_DIR / CREATED_FILE_NAME
 
     #Clear file before writing
     if RESET_CSV and csv_path.exists():
@@ -117,10 +119,9 @@ if __name__ == "__main__":
 
     ensure_csv_with_header(csv_path, CSV_FIELDS)
 
-    size = 3
     for depth in DEFAULT_BUCKETS:
         for trial in range(1, DEFAULT_TRIALS + 1):
-            row = run_one_trial(size=size, depth=depth, trial=trial, base_seed=DEFAULT_BASE_SEED)
+            row = run_one_trial(size=SIZE, depth=depth, trial=trial, base_seed=DEFAULT_BASE_SEED)
             if row is None:
                 #print("SIM FAILED")
                 continue

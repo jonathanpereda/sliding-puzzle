@@ -2,6 +2,11 @@ import csv
 from pathlib import Path
 from datetime import date
 
+today = date.today().isoformat()
+SIZE = 3
+CREATED_FILE_NAME = f"idastar[3x3]_summary_{today}.md"
+SOLVER_TITLE = "IDASTAR_manhattan"
+CVS_PATH = "data/idastar_runs[3x3].csv"
 
 def load_solver_rows(csv_path):
     with open(csv_path, newline="", encoding="utf-8") as f:
@@ -64,14 +69,13 @@ def aggregate_by_depth(rows):
         a["avg_mem"] = a["sum_mem"] / trials
         a["avg_solu"] = a["sum_solu"] / trials
 
-    for i in ["sum_time_sec", "sum_states", "sum_mem", "sum_solu"]:
-        del a[i]    #delete intermediate sums
+        for i in ["sum_time_sec", "sum_states", "sum_mem", "sum_solu"]:
+            del a[i]    #delete intermediate sums
 
     return agg
 
 
 def render_markdown(agg, board_size, title_solver):
-    today = date.today().isoformat()
     title = f"# {title_solver} -Benchmark Summary- [{board_size}x{board_size}]"
     datelog = f"Generated: {today}"
 
@@ -101,7 +105,7 @@ def render_markdown(agg, board_size, title_solver):
     lines = [title, datelog, "", header, sep] + data_rows
     markdown = "\n".join(lines) + "\n"
 
-    out_path = Path("docs") / f"idastar[3x3]_summary_{today}.md"     #CHANGE FILE NAME
+    out_path = Path("docs") / CREATED_FILE_NAME    
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(markdown, encoding="utf-8")
 
@@ -110,4 +114,4 @@ def render_markdown(agg, board_size, title_solver):
 #agg = aggregate_by_depth(load_solver_rows(Path("data/bfs_runs.csv")))
 #print(agg[10])
 
-render_markdown(aggregate_by_depth(load_solver_rows(Path("data/idastar_runs[3x3].csv"))), 3, "IDASTAR_manhattan")
+render_markdown(aggregate_by_depth(load_solver_rows(Path(CVS_PATH))), SIZE, SOLVER_TITLE)

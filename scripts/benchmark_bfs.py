@@ -13,6 +13,7 @@ from src.sliding_puzzle.solvers.bfs import bfs
 DEFAULT_BUCKETS = [0,5,10,15,20,25,30,35,40,45,50,55,60]
 DEFAULT_TRIALS = 30
 DEFAULT_BASE_SEED = 1337
+SOLVER_NAME = "BFS"
 
 #Clear file before writing
 RESET_CSV = True
@@ -82,7 +83,7 @@ def run_one_trial(size, depth, trial, base_seed):
         "states_expanded": states_expanded,
         "peak_memory_use": peak_kb,
         "solution_length": solution_length,
-        "solver": "BFS",
+        "solver": SOLVER_NAME,
         "seed": trial_seed,
     }
     return row
@@ -106,7 +107,7 @@ def do_scramble(goal_tuple, depth, size, rng):
 
 
 if __name__ == "__main__":
-    csv_path = DATA_DIR / "bfs_runs.csv"
+    csv_path = DATA_DIR / "bfs_runs[3x3].csv"
 
     #Clear file before writing
     if RESET_CSV and csv_path.exists():
