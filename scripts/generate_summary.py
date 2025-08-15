@@ -101,7 +101,7 @@ def render_markdown(agg, board_size, title_solver):
     lines = [title, datelog, "", header, sep] + data_rows
     markdown = "\n".join(lines) + "\n"
 
-    out_path = Path("docs") / f"astar[4x4]_summary_{today}.md"     #CHANGE FILE NAME
+    out_path = Path("docs") / f"idastar[3x3]_summary_{today}.md"     #CHANGE FILE NAME
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(markdown, encoding="utf-8")
 
@@ -110,4 +110,4 @@ def render_markdown(agg, board_size, title_solver):
 #agg = aggregate_by_depth(load_solver_rows(Path("data/bfs_runs.csv")))
 #print(agg[10])
 
-render_markdown(aggregate_by_depth(load_solver_rows(Path("data/astar_runs[4x4].csv"))), 4, "ASTAR_manhattan")
+render_markdown(aggregate_by_depth(load_solver_rows(Path("data/idastar_runs[3x3].csv"))), 3, "IDASTAR_manhattan")
